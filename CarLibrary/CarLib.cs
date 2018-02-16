@@ -5,10 +5,11 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 
+
 namespace CarLibrary
 {
     [Flags]
-     enum ACCESSORIES
+     public enum ACCESSORIES
     {
         None = 0,
         DVDPlayer = 1,
@@ -19,114 +20,128 @@ namespace CarLibrary
         BluetoothAccessories = 32
     }
 
-    class CarLib : INotifyPropertyChanged
+    public class CarLib : INotifyPropertyChanged
     {
-        static int NUMBEROFCAR = 1;
-        int carID;
-        string carName;
-        double carSpeed;
-        bool used;
-        Color color;
+        static private int NUMBEROFCAR = 1;
+        private int carID;
+        private string carName;
+        private double carSpeed;
+        private bool used;
+        private Color color;
         //ACCESSORIES accessory;
-        List<ACCESSORIES> accessory;// = new List<ACCESSORIES>();
-        public ObservableCollection<CarLib> cars = CarLib.GetAllCars();
+        private List<ACCESSORIES> accessory;// = new List<ACCESSORIES>();
+        private static ObservableCollection<CarLib> cars = new ObservableCollection<CarLib>();
 
-        protected int CarID
+        public int CarID
         {
             get
             {
                 return carID;
             }
-            set
+            private set
             {
                 carID = NUMBEROFCAR;
                 Notify("CarID");
                 NUMBEROFCAR++;
             }
         }
-        protected string CarName
+        public string CarName
         {
             get
             {
                 return carName;
             }
-            set
+            private set
             {
                 carName = value;
                 Notify("CarName");
             }
         }
-        protected double CarSpeed
+        public double CarSpeed
         {
             get
             {
                 return carSpeed;
             }
-            set
+            private set
             {
                 carSpeed = value;
                 Notify("CarSpeed");
             }
         }
-        protected bool Used
+        public bool Used
         {
             get
             {
                 return used;
             }
-            set
+            private set
             {
                 used = value;
                 Notify("Used");
             }
         }
-        protected Color Color
+        public Color Color
         {
             get
             {
                 return color;
             }
-            set
+            private set
             {
                 color = value;
                 Notify("Color");
             }
         }
-        protected List<ACCESSORIES> Accessory
+        public List<ACCESSORIES> Accessory
         {
             get
             {
                 return accessory;
             }
-            set
+            private set
             {
                 accessory = value;
                 Notify("Accessory");
             }
         }
 
-        public CarLib(string carName, double carSpeed, bool used, Color color,
-           ACCESSORIES accessory)
-        {            
-            this.CarID = NUMBEROFCAR;
-            this.CarName = carName;
-            this.CarSpeed = carSpeed;
-            this.Used = used;
-            this.Color = color;
-            this.Accessory.Add(accessory);
-            NUMBEROFCAR++;              
-        }
-
-        public static CarLib CreateCar(string carName, double carSpeed, bool used, Color color,
+        public static void CreateCar(string carName, double carSpeed, bool used, Color color,
            ACCESSORIES accessory)
         {
-            CarLib car = new CarLib(carName, carSpeed, used, color, accessory);   
-            
-            return car;
+            CarLib car = new CarLib
+            {
+                CarID = NUMBEROFCAR,
+                CarName = carName,
+                CarSpeed = carSpeed,
+                Used = used,
+                Color = color
+            };
+            car.Accessory.Add(accessory);
+            cars.Add(car);
+            NUMBEROFCAR++;
+        }
+
+        public static ObservableCollection<CarLib> GetListOfCars()
+        {
+            return cars;
+        }
+        public static CarLib GetCarInfo(int carID)
+        {
+            foreach (CarLib car in cars)
+            {
+                //for (int i = 0; i < cars.Count; i++)
+                //{
+                if (car.carID == carID)
+                {
+                    return car;
+                }
+                //}                 
+            }
+            throw new Exception("Car is not found");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected void Notify(string propName)
         {
             if (this.PropertyChanged != null)
@@ -134,11 +149,14 @@ namespace CarLibrary
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
-
-        public static ObservableCollection<CarLib> GetAllCars()
+        public static void CreateSampleCars()
         {
-            ObservableCollection<CarLib> cars = new ObservableCollection<CarLib>();
-
-            return cars;
+            CarLib.CreateCar("Honda", 400, true, Color.Aquamarine, ACCESSORIES.Camera);
+            CarLib.CreateCar("Nissan", 400, true, Color.Aquamarine, ACCESSORIES.Camera);
+            CarLib.CreateCar("Mazda", 400, true, Color.Aquamarine, ACCESSORIES.GPS | ACCESSORIES.DVDPlayer);
+            CarLib.CreateCar("Ford", 400, true, Color.Aquamarine, ACCESSORIES.Camera | ACCESSORIES.SecurityClock);
+            CarLib.CreateCar("Nissan", 400, true, Color.Aquamarine, ACCESSORIES.None);
+            CarLib.CreateCar("Honda", 400, true, Color.Aquamarine, ACCESSORIES.Warmer);
         }
+    }
 }
